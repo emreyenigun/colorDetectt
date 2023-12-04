@@ -1,5 +1,4 @@
 import cv2 as cv
-from PIL import Image
 from util import get_limits
 
 yellow = [0, 255, 255]
@@ -9,31 +8,36 @@ if not cap.isOpened():
     print("Cannot open camera")
     exit()
 
+totalPixels = 0
+yellowPixels = 0
+nonYellowPixels = 0
+
 while True:
     ret, frame = cap.read()
-  
+    
     if not ret:
         print("Can't receive frame (stream end?). Exiting ...")
         break
-  
+
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-   
+
     lowerLimit, upperLimit = get_limits(color=yellow)
-    
+
     mask = cv.inRange(hsv, lowerLimit, upperLimit)
-    
-    mask2 = Image.fromarray(mask)
 
-    bbox = mask2.getbbox()
-    
-    if bbox is not None:
-        x1, y1, x2, y2 = bbox
-        
-        frame = cv.rectangle(frame, (x1, y1), (x2, y2), (255,0,0), thickness=2) 
+    totalPixels += mask.shape[0] * mask.shape[1]
 
-    print(bbox)
+    yellowPixels += cv.countNonZero(mask)
 
-    cv.imshow("cam", frame) 
+    nonYellowPixels = totalPixels - yellowPixels
+
+    #percentage of yellow pixelsq
+    yellowPixelPercantage = (yellowPixels / totalPixels) * 100
+
+    print("Yellow pixel percentage:", yellowPixelPercantage)
+
+    cv.imshow("cam", frame)
+
     if cv.waitKey(1) == ord('q'):
         break
 
