@@ -1,0 +1,12 @@
+from colorthief import ColorThief
+import matplotlib.pyplot as plt
+
+ct = ColorThief("lettuce.webp")
+d_color = (ct.get_color(quality=1))
+
+plt.imshow([[d_color]])
+plt.show()
+
+palette = ct.get_palette(color_count=2)
+plt.imshow([[palette[i] for i in range(2)]])
+plt.show()

@@ -1,9 +1,10 @@
 import cv2 as cv
 from util import get_limits
 
-image = cv.imread('MosaicLettuce.jpg')
+image = cv.imread('apple-virus1.jpg')
 
 yellow = [0, 255, 255]
+green = [0, 255, 0]
 
 if image is None:
     print("Failed to read image file")
@@ -11,19 +12,24 @@ if image is None:
 
 hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
 
-lowerLimit, upperLimit = get_limits(color=yellow)
+yellowLowerLimit, yellowUpperLimit = get_limits(color=yellow)
+greenLowerLimit, greenUpperLimit = get_limits(color=green)
 
-mask = cv.inRange(hsv, lowerLimit, upperLimit)
+yellowMask = cv.inRange(hsv, yellowLowerLimit, yellowUpperLimit)
+greenMask = cv.inRange(hsv, greenLowerLimit, greenUpperLimit)
 
-totalPixels = mask.shape[0] * mask.shape[1]
+yellowPixels = cv.countNonZero(yellowMask)
+greenPixels = cv.countNonZero(greenMask)
 
-yellowPixels = cv.countNonZero(mask)
+yellowAndGreenPixels = cv.countNonZero(yellowMask | greenMask)
 
-nonYellowPixels = totalPixels - yellowPixels
+print(greenPixels)
+print(yellowPixels)
 
-yellowPixelPercentage = (yellowPixels / totalPixels) * 100
 
-print("Yellow pixel percentage:", yellowPixelPercentage)
+yellowToGreenRatio = yellowPixels / greenPixels
+
+print("Yellow to green pixel ratio:", yellowToGreenRatio)
 
 cv.imshow("Image", image)
 cv.waitKey(0)

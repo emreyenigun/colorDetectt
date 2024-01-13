@@ -1,0 +1,28 @@
+import webcolors
+import matplotlib.pyplot as plt
+import cv2 as cv
+
+##If it even detects a yellow color even if its just 2 percent, classify it as mosaic virus detected.
+
+def closest(rgb):
+    differences = {}
+    for color_hex, color_name in webcolors.CSS3_HEX_TO_NAMES.items():
+        r, g, b = webcolors.hex_to_rgb(color_hex)
+        differences[sum([(r - rgb[0]) ** 2,
+                         (g - rgb[1]) ** 2,
+                         (b - rgb[2]) ** 2])] = color_name
+    
+    return differences[min(differences.keys())]
+
+image = cv.imread('MosaicLettuce.jpg')
+hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
+
+try: 
+    cname = webcolors.rgb_to_name(hsv)
+    print(f"The color is exactly {cname}")
+except ValueError:
+    cname = closest(hsv)
+    print(f"The Color is closes to {cname}")
+
+plt.imshow([[hsv]])
+plt.show
